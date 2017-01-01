@@ -11,13 +11,11 @@ Example for setting up zap with gelf data sink:
     var gelfForwarder zap.WriteSyncer
     func init() {
         gelfForwarder = gelf.New(gelf.NewConfig("127.0.0.1"))
-        lvf := func() zap.LevelFormatter {
-            return zap.LevelFormatter(func(l zap.Level) zap.Field {
-                return zap.Int(gelf.LevelTag, gelf.ZapLevelToGelfLevel(int32(l)))
-            })
-        }
+        lvf := zap.LevelFormatter(func(l zap.Level) zap.Field {
+            return zap.Int(gelf.LevelTag, gelf.ZapLevelToGelfLevel(int32(l)))
+        })
         logger = zap.New(
-            zap.NewJSONEncoder(zap.NoTime(), zap.MessageFormatter(zap.MessageKey("short_message")), lvf()),
+            zap.NewJSONEncoder(zap.NoTime(), zap.MessageFormatter(zap.MessageKey("short_message")), lvf),
             zap.DebugLevel,
             zap.Fields(
                 zap.String(gelf.VersionTag, gelf.Version),
