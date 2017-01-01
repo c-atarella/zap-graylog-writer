@@ -8,9 +8,7 @@ Please ensure that the [required](http://docs.graylog.org/en/2.1/pages/gelf.html
 Example for setting up zap with gelf data sink:
 
     var logger zap.Logger
-    var gelfForwarder zap.WriteSyncer
     func init() {
-        gelfForwarder = gelf.New(gelf.NewConfig("127.0.0.1"))
         lvf := zap.LevelFormatter(func(l zap.Level) zap.Field {
             return zap.Int(gelf.LevelTag, gelf.ZapLevelToGelfLevel(int32(l)))
         })
@@ -22,7 +20,7 @@ Example for setting up zap with gelf data sink:
                 zap.String(gelf.HostTag, "MyFancyApp"),
                 zap.Int("_pid", os.Getpid()),
                 zap.String("_exe", path.Base(os.Args[0]))),
-            zap.Output(gelfForwarder),
+            zap.Output(gelf.New(gelf.NewConfig("127.0.0.1"))),
         )
     }
 
