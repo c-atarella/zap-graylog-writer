@@ -44,3 +44,17 @@ func TestZapLevelToGelfLevel(t *testing.T) {
 		})
 	}
 }
+
+func TestNewDefaultConfig(t *testing.T) {
+	result := NewDefaultConfig("foo")
+
+	if result.GraylogHostname != "foo" {
+		t.Errorf("Expected for result.GraylogHostname value %v but got value %v", "foo", result.GraylogHostname)
+	}
+	if result.GraylogPort != 12201 {
+		t.Errorf("Expected for result.GraylogPort value %v but got value %v", 8154, result.GraylogPort)
+	}
+	if result.MaxChunkSize != 8154 {
+		t.Errorf("Expected for result.MaxChunkSize value %v but got value %v", 8154, result.MaxChunkSize)
+	}
+}

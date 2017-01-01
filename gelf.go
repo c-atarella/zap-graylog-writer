@@ -54,6 +54,11 @@ type Config struct {
 	MaxChunkSize    int
 }
 
+// NewDefaultConfig provides a configuration with default values for port and chunk size.
+func NewDefaultConfig(host string) Config {
+	return Config{GraylogPort: 12201, MaxChunkSize: 8154, GraylogHostname: host}
+}
+
 // ZapWriteSyncer mirrors zap.WriteSyncer
 type ZapWriteSyncer interface {
 	io.Writer
