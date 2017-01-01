@@ -1,6 +1,6 @@
 # zap-graylog-writer
 
-Writes log message from uber-go/zap to GELF input (as provided by graylog2, ELK stack, etc.). 
+Writes log messages from uber-go/zap to GELF input (as provided by [graylog2](http://docs.graylog.org/en/2.1/pages/sending_data.html), ELK stack, etc.). 
 Code for feeding data into gelf sink has been taken from [github.com/robertkowalski/graylog-golang](https://github.com/robertkowalski/graylog-golang).
 
 Please ensure that the [required](http://docs.graylog.org/en/2.1/pages/gelf.html) gelf fields are provided. 
@@ -34,3 +34,4 @@ Example for setting up zap with gelf data sink:
 * currently compression not supported!
 * no safety checks for invalid fields!
 * use at your own risk :)
+* tested with graylog-2.1.2
