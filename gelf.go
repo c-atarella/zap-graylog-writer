@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/binary"
-	"fmt"
 	"io"
 	"log"
 	"math"
@@ -21,6 +20,8 @@ const (
 	HostTag = "host"
 	// LevelTag is mandatory
 	LevelTag = "level"
+	// MessageKey provides the key value for gelf message field
+	MessageKey = "short_message"
 )
 
 // ZapLevelToGelfLevel maps the zap log levels to the syslog severity levels used for gelf.
@@ -110,7 +111,7 @@ func (g *gelf) Write(p []byte) (int, error) {
 		}
 	}
 
-	fmt.Printf("Wrote data: %s\n", p)
+	//fmt.Printf("Wrote data: %s\n", p)
 	return len(p), nil
 }
 

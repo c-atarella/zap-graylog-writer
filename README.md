@@ -15,7 +15,7 @@ Example for setting up zap with gelf data sink:
             return zap.Int(gelf.LevelTag, gelf.ZapLevelToGelfLevel(int32(l)))
         })
         logger = zap.New(
-            zap.NewJSONEncoder(zap.NoTime(), zap.MessageFormatter(zap.MessageKey("short_message")), lvf),
+            zap.NewJSONEncoder(zap.NoTime(), zap.MessageFormatter(zap.MessageKey(gelf.MessageKey)), lvf),
             zap.DebugLevel,
             zap.Fields(
                 zap.String(gelf.VersionTag, gelf.Version),
