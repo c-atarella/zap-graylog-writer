@@ -15,6 +15,8 @@ import (
 const (
 	// VersionTag is mandatory
 	VersionTag = "version"
+	// Version of supported gelf format
+	Version = "1.1"
 	// HostTag is mandatory
 	HostTag = "host"
 	// LevelTag is mandatory
