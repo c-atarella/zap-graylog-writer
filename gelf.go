@@ -4,11 +4,13 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/binary"
-	"io"
 	"log"
 	"math"
 	"net"
 	"strconv"
+
+	"go.uber.org/zap"
+	"go.uber.org/zap/zapcore"
 )
 
 const (
@@ -22,32 +24,45 @@ const (
 	LevelTag = "level"
 	// MessageKey provides the key value for gelf message field
 	MessageKey = "short_message"
+	TimeKey    = "timestamp"
 )
+
+func NewGelfCore(host string, appOrHostName string, fs ...zapcore.Field) (zapcore.Core, zap.Option) {
+	allLevels := zap.LevelEnablerFunc(func(l zapcore.Level) bool { return true })
+	syncer := New(NewDefaultConfig(host))
+
+	config := zap.NewProductionEncoderConfig()
+	config.EncodeLevel = SyslogLevelEncoder
+	config.MessageKey = MessageKey
+	config.TimeKey = TimeKey
+
+	jsonEncode := zapcore.NewJSONEncoder(config)
+
+	// see http://docs.graylog.org/en/2.3/pages/gelf.html for documentation of the gelf format
+	option := zap.Fields(append(fs, zap.String(VersionTag, Version), zap.String(HostTag, appOrHostName))...)
+
+	return zapcore.NewCore(jsonEncode, syncer, allLevels), option
+}
 
 // ZapLevelToGelfLevel maps the zap log levels to the syslog severity levels used for gelf.
 // See https://en.wikipedia.org/wiki/Syslog for details.
-func ZapLevelToGelfLevel(l int32) int {
+func SyslogLevelEncoder(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
 	switch l {
-	// DebugLevel
-	case -1:
-		return 7
-	// InfoLevel
-	case 0:
-		return 6
-	// WarnLevel
-	case 1:
-		return 4
-	// ErrorLevel
-	case 2:
-		return 3
-	// DPanicLevel
-	// PanicLevel
-	// FatalLevel
-	case 3, 4, 5:
-		return 0
+	case zapcore.DebugLevel:
+		enc.AppendInt(7)
+	case zapcore.InfoLevel:
+		enc.AppendInt(6)
+	case zapcore.WarnLevel:
+		enc.AppendInt(4)
+	case zapcore.ErrorLevel:
+		enc.AppendInt(3)
+	case zapcore.DPanicLevel:
+		enc.AppendInt(0)
+	case zapcore.PanicLevel:
+		enc.AppendInt(0)
+	case zapcore.FatalLevel:
+		enc.AppendInt(0)
 	}
-	// default, should never happen
-	return 1
 }
 
 // Config represents the required settings for connecting the gelf data sink.
@@ -62,14 +77,8 @@ func NewDefaultConfig(host string) Config {
 	return Config{GraylogPort: 12201, MaxChunkSize: 8154, GraylogHostname: host}
 }
 
-// ZapWriteSyncer mirrors zap.WriteSyncer
-type ZapWriteSyncer interface {
-	io.Writer
-	Sync() error
-}
-
 // New returns an implementation of ZapWriteSyncer which should be compatible with zap.WriteSyncer
-func New(config Config) ZapWriteSyncer {
+func New(config Config) zapcore.WriteSyncer {
 	return &gelf{Config: config}
 }
 
